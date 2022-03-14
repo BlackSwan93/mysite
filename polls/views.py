@@ -6,6 +6,28 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import generic
 
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('polls/dashboard.html')
+    else:
+        form = UserCreationForm()
+    return render(request, 'polls/signup.html', {'form': form})
+
+def dashboard(request):
+    return render(request, "polls/dashboard.html")
+
+
 
 # latest_question_list = Question.objects.order_by('-pub_date')[:5]
 # template = loader.get_template('polls/index.html')
